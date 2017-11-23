@@ -33,7 +33,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         resignResponder()
         let words = read() // touple of words
         guard (words.0 != nil) && (words.1 != nil) else {  // checks if all fields are filled
-            alert(alert: true)
+            alert(alert: "TextFields not filled")
             return
         }
         save(words: words as! (String, String))
@@ -45,15 +45,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     //MARK: Functions
     
-    func alert(alert: Bool) { // allert function
-        var alertMessage : String = ""
-        switch alert {
-        case true:
-            alertMessage = "TextFields not filled"
-        case false:
-            alertMessage = "some error"
-        }
-        let alertController = UIAlertController(title: "Alert", message: alertMessage, preferredStyle: .alert)
+    func alert(alert: String) { // allert function
+        let alertController = UIAlertController(title: "Alert", message: alert, preferredStyle: .alert)
         let OKAction = UIAlertAction(title: "OK", style: .default) { (action:UIAlertAction!) in
             // Code in this block will trigger when OK button tapped.
             print("Ok button tapped");
