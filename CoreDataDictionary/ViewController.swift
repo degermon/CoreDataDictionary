@@ -16,6 +16,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     var lithuanianWord : String = String()
     var englishWord : String = String()
+    var dictionaryWords: [NSManagedObject] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +34,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         resignResponder()
         let words = read() // touple of words
         guard (words.0 != nil) && (words.1 != nil) else {  // checks if all fields are filled
-            alert(alert: "TextFields not filled")
+            alert(alertMessage: "TextFields not filled")
             return
         }
         save(words: words as! (String, String))
@@ -45,8 +46,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     //MARK: Functions
     
-    func alert(alert: String) { // allert function
-        let alertController = UIAlertController(title: "Alert", message: alert, preferredStyle: .alert)
+    func alert(alertMessage: String) { // allert function
+        let alertController = UIAlertController(title: "Alert", message: alertMessage, preferredStyle: .alert)
         let OKAction = UIAlertAction(title: "OK", style: .default) { (action:UIAlertAction!) in
             // Code in this block will trigger when OK button tapped.
             print("Ok button tapped");
@@ -108,6 +109,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
         wordsDictionary.setValue(ltWord, forKey: "lithuanian")
         wordsDictionary.setValue(engWord, forKey: "english")
+        
+        do {
+            try managedContext.save()
+            dictionaryWords.append(wordsDictionary)
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
     }
     
     func fetchData(){
