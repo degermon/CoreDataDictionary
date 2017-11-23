@@ -32,7 +32,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     @IBAction func saveButtonTapped(_ sender: UIButton) {
         resignResponder()
         let words = read() // touple of words
-        guard (words.0 != nil) && (words.1 != nil) else {
+        guard (words.0 != nil) && (words.1 != nil) else {  // checks if all fields are filled
             alert(alert: true)
             return
         }
@@ -45,7 +45,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     //MARK: Functions
     
-    func alert(alert: Bool) {
+    func alert(alert: Bool) { // allert function
         var alertMessage : String = ""
         switch alert {
         case true:
@@ -67,7 +67,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         englishTextField.resignFirstResponder()
     }
     
-    func read() -> (String?, String?) {
+    func read() -> (String?, String?) {  // reads data from text fields
         let ltWord : String? = readLithuanianTextField()
         let engWord : String? = readEnglishTextField()
         return (ltWord, engWord)
@@ -78,7 +78,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             let ltWord = lithuanianTextField.text
             return ltWord
         } else {
-            print("Error, there is no text in textfield in lt") // Temporary till implementation of error handling
+            print("Error, there is no text in textfield in lt")
             return nil
         }
     }
@@ -88,13 +88,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
             let engWord = englishTextField.text
             return engWord
         } else {
-            print("Error, there is no text in textfield in eng") // Temporary till implementation of error handling
+            print("Error, there is no text in textfield in eng")
             return nil
         }
     }
     
     
-    //MARK: CoreData
+    //MARK: CoreData actions
     
     func save(words: (String, String)) {
         guard let appDelegate =
