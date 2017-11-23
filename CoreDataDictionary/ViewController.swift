@@ -107,8 +107,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
         let wordsDictionary = NSManagedObject(entity: entity,
                                              insertInto: managedContext)
 
-        wordsDictionary.setValue(ltWord, forKey: "lithuanian")
-        wordsDictionary.setValue(engWord, forKey: "english")
+        wordsDictionary.setValue(ltWord, forKey: "lithuanianWord")
+        wordsDictionary.setValue(engWord, forKey: "englishWord")
         
         do {
             try managedContext.save()
@@ -119,17 +119,22 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     func fetchData(){
+        var dictionary = [String:String]()
         let managedContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let fetchRequest =
             NSFetchRequest<NSManagedObject>(entityName: "Dictionary")
         do {
-            let result = try managedContext.fetch(fetchRequest)
-            for data in result {
-                print(data.value(forKey: "lithuanian") as! String)
-                print(data.value(forKey: "english") as! String)
-            }
+            dictionaryWords = try managedContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
+        
+    
+        for dictWord in dictionaryWords {
+            if let lithuanian = dictWord.value(forKey: "lithuanianWord") as! String?, let english = dictWord.value(forKey: "englishWord") as! String? {
+                dictionary[lithuanian] = english
+            }
+        }
+        print(dictionary)
     }
 }
