@@ -37,6 +37,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             alert(alertMessage: "TextFields not filled")
             return
         }
+        update(ltWord: words.0!, engWord: words.1!)
         save(words: words as! (String, String))
     }
     
@@ -44,7 +45,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         fetchData()
     }
     
-    //MARK: Functions
+    //MARK: Alert Method
     
     func alert(alertMessage: String) { // allert function
         let alertController = UIAlertController(title: "Alert", message: alertMessage, preferredStyle: .alert)
@@ -55,6 +56,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
         alertController.addAction(OKAction)
         present(alertController, animated: true, completion:nil)
     }
+    
+    //MARK: Methods
     
     func resignResponder() {
         lithuanianTextField.resignFirstResponder()
@@ -104,18 +107,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
         let entity =
             NSEntityDescription.entity(forEntityName: "Dictionary",
                                        in: managedContext)!
-        let wordsDictionary = NSManagedObject(entity: entity,
-                                             insertInto: managedContext)
-
-        wordsDictionary.setValue(ltWord, forKey: "lithuanianWord")
-        wordsDictionary.setValue(engWord, forKey: "englishWord")
+        let dictWord = NSManagedObject(entity: entity,
+                                              insertInto: managedContext)
         
-        do {
-            try managedContext.save()
-            dictionaryWords.append(wordsDictionary)
-        } catch let error as NSError {
-            print("Could not save. \(error), \(error.userInfo)")
-        }
+        dictWord.setValue(ltWord, forKey: "lithuanianWord")
+        dictWord.setValue(engWord, forKey: "englishWord")
+        
+        savePermanently(dictWord: dictWord, managedContext: managedContext)
     }
     
     func fetchData(){
@@ -129,7 +127,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
         
-    
+        
         for dictWord in dictionaryWords {
             if let lithuanian = dictWord.value(forKey: "lithuanianWord") as! String?, let english = dictWord.value(forKey: "englishWord") as! String? {
                 dictionary[lithuanian] = english
@@ -137,4 +135,39 @@ class ViewController: UIViewController, UITextFieldDelegate {
         }
         print(dictionary)
     }
+    
+    func update(ltWord: String, engWord: String) {
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+                return
+        }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        for dictWord in dictionaryWords {
+            if let lithuanian = dictWord.value(forKey: "lithuanianWord") as! String?, let english = dictWord.value(forKey: "englishWord") as! String? {
+                
+                if lithuanian == ltWord || english == engWord {
+                    dictWord.setValue(ltWord, forKey: "lithuanianWord")
+                    alert(alertMessage: "English word was updated")
+                    
+                    if english == engWord {
+                        dictWord.setValue(engWord, forKey: "englishWord")
+                        alert(alertMessage: "Lithuanian word was updated")
+                    }
+                
+                    savePermanently(dictWord: dictWord, managedContext: managedContext)
+                }
+            }
+        }
+    }
+    
+    func savePermanently(dictWord: NSManagedObject, managedContext: NSManagedObjectContext) {
+        do {
+            try managedContext.save()
+            dictionaryWords.append(dictWord)
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
 }
+
