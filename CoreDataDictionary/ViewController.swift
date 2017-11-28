@@ -32,12 +32,14 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func saveButtonTapped(_ sender: UIButton) {
         resignResponder()
-        let words = read() // touple of words
-        guard (words.0 != nil) && (words.1 != nil) else {  // checks if all fields are filled
+        let a = read()
+        if (a.lt != nil) && (a.eng != nil) {  // checks if all fields are filled
+            createObjectAndSendData(ltWord: a.lt!, engWord: a.eng!)
+        } else {
             alert(alertMessage: "TextFields not filled")
-            return
         }
-        createObjectAndSendData(ltWord: words.0!, engWord: words.1!)
+        // vietoj tuplu returno siust duomenys i atskira klase
+        //createObjectAndSendData(ltWord: a.lt!, engWord: a.eng!)
         //update(ltWord: words.0!, engWord: words.1!)
         //save(words: words as! (String, String))
     }
@@ -70,10 +72,11 @@ class ViewController: UIViewController, UITextFieldDelegate {
         englishTextField.resignFirstResponder()
     }
     
-    func read() -> (String?, String?) {  // reads data from text fields
-        let ltWord : String? = readLithuanianTextField()
-        let engWord : String? = readEnglishTextField()
-        return (ltWord, engWord)
+    func read() -> DataClass {  // reads data from text fields
+        let a = DataClass()
+        a.lt = readLithuanianTextField()
+        a.eng = readEnglishTextField()
+        return a
     }
     
     func readLithuanianTextField() -> String? {
@@ -180,5 +183,9 @@ class Intermidiary : ViewController {
         update(ltWord: ltWord, engWord: engWord)
         save(ltWord: ltWord, engWord: engWord)
     }
-    
+}
+
+class DataClass {
+    var lt : String? = nil
+    var eng : String? = nil
 }
