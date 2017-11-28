@@ -17,18 +17,10 @@ class ViewController: UIViewController, UITextFieldDelegate {
     var lithuanianWord : String = String()
     var englishWord : String = String()
     var dictionaryWords: [NSManagedObject] = []
-  //  var arrayString = Array<String>()
-  //  var arrayInt = Array<Int>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-    /*    for item in 0...200 {
-            arrayString.append(("a" + "\(item)"))
-        }
-        for item in arrayString {
-            arrayInt.append(Int(item)!)
-        } */
     }
     
     override func didReceiveMemoryWarning() {
@@ -45,24 +37,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
             alert(alertMessage: "TextFields not filled")
             return
         }
-        
-        // cant be int and string
-        
-        let a = SaveToCoreData()
-        a.update(ltWord: words.0!, engWord: words.1!)
-        a.save(words: words as! (String, String))
-        /*
-        arrayInt[item] = SaveToCoreData()
-        arrayInt[item].update(ltWord: words.0!, engWord: words.1!)
-        arrayInt[item].save(words: words as! (String, String))
-        item += 1
- */
+        createObjectAndSendData(ltWord: words.0!, engWord: words.1!)
+        //update(ltWord: words.0!, engWord: words.1!)
+        //save(words: words as! (String, String))
     }
     
     @IBAction func recallButtonTapped(_ sender: UIButton) {
-        //fetchData()
-        let first = FetchFromCoreData()
-        first.fetchData()
+        fetchData()
     }
     
     //MARK: Alert Method
@@ -78,6 +59,11 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     //MARK: Methods
+    
+    func createObjectAndSendData(ltWord: String, engWord: String) {
+        let object = Intermidiary()
+        object.intermidiaryData(ltWord: ltWord, engWord: engWord)
+    }
     
     func resignResponder() {
         lithuanianTextField.resignFirstResponder()
@@ -110,19 +96,14 @@ class ViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    //MARK: CoreData actions
-}
-
-class SaveToCoreData : ViewController {
     
-    func save(words: (String, String)) {
+    //MARK: CoreData actions
+    
+    func save(ltWord: String, engWord: String) {
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
                 return
         }
-        
-        let ltWord = words.0
-        let engWord = words.1
         
         let managedContext = appDelegate.persistentContainer.viewContext
         
@@ -136,6 +117,26 @@ class SaveToCoreData : ViewController {
         dictWord.setValue(engWord, forKey: "englishWord")
         
         savePermanently(dictWord: dictWord, managedContext: managedContext)
+    }
+    
+    func fetchData(){
+        var dictionary = [String:String]()
+        let managedContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let fetchRequest =
+            NSFetchRequest<NSManagedObject>(entityName: "Dictionary")
+        do {
+            dictionaryWords = try managedContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+        
+        
+        for dictWord in dictionaryWords {
+            if let lithuanian = dictWord.value(forKey: "lithuanianWord") as! String?, let english = dictWord.value(forKey: "englishWord") as! String? {
+                dictionary[lithuanian] = english
+            }
+        }
+        print(dictionary)
     }
     
     func update(ltWord: String, engWord: String) {
@@ -173,26 +174,11 @@ class SaveToCoreData : ViewController {
     }
 }
 
-class FetchFromCoreData : ViewController {
+class Intermidiary : ViewController {
     
-    func fetchData(){
-        var dictionary = [String:String]()
-        let managedContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let fetchRequest =
-            NSFetchRequest<NSManagedObject>(entityName: "Dictionary")
-        do {
-            dictionaryWords = try managedContext.fetch(fetchRequest)
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }
-        
-        
-        for dictWord in dictionaryWords {
-            if let lithuanian = dictWord.value(forKey: "lithuanianWord") as! String?, let english = dictWord.value(forKey: "englishWord") as! String? {
-                dictionary[lithuanian] = english
-            }
-        }
-        print(dictionary)
+    func intermidiaryData(ltWord: String, engWord: String) {
+        update(ltWord: ltWord, engWord: engWord)
+        save(ltWord: ltWord, engWord: engWord)
     }
+    
 }
-
