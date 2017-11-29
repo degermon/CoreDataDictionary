@@ -127,7 +127,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     }
     
     func fetchData(){
-        //var dictionary = [String:String]()
+        var dictionary = [String:String]()
         let managedContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let fetchRequest =
             NSFetchRequest<NSManagedObject>(entityName: "Dictionary")
@@ -140,13 +140,13 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         
         for dictWord in dictionaryWords {
             if let lithuanian = dictWord.value(forKey: "lithuanianWord") as! String?, let english = dictWord.value(forKey: "englishWord") as! String? {
-                myDataLithuanian.append(lithuanian)
-                myDataEnglish.append(english)
-                //dictionary[lithuanian] = english
+                dictionary[lithuanian] = english
             }
         }
+        myDataLithuanian = dictionary.map { $0.0 }
+        myDataEnglish = dictionary.map { $0.1 }
+        
         //print(dictionary)
-        //myData = dictionary
     }
     
     func update(ltWord: String, engWord: String) {
