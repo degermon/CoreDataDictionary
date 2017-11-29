@@ -9,14 +9,17 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, UITextFieldDelegate {
+class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate {
     
+    @IBOutlet weak var myTable: UITableView!
     @IBOutlet weak var lithuanianTextField: UITextField!
     @IBOutlet weak var englishTextField: UITextField!
     
     var lithuanianWord : String = String()
     var englishWord : String = String()
     var dictionaryWords: [NSManagedObject] = []
+    var myDataLithuanian : [String] = []
+    var myDataEnglish : [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,6 +49,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func recallButtonTapped(_ sender: UIButton) {
         fetchData()
+        self.myTable.reloadData()
     }
     
     //MARK: Alert Method
@@ -123,7 +127,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     func fetchData(){
-        var dictionary = [String:String]()
+        //var dictionary = [String:String]()
         let managedContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let fetchRequest =
             NSFetchRequest<NSManagedObject>(entityName: "Dictionary")
@@ -136,10 +140,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
         for dictWord in dictionaryWords {
             if let lithuanian = dictWord.value(forKey: "lithuanianWord") as! String?, let english = dictWord.value(forKey: "englishWord") as! String? {
-                dictionary[lithuanian] = english
+                myDataLithuanian.append(lithuanian)
+                myDataEnglish.append(english)
+                //dictionary[lithuanian] = english
             }
         }
-        print(dictionary)
+        //print(dictionary)
+        //myData = dictionary
     }
     
     func update(ltWord: String, engWord: String) {
@@ -174,6 +181,19 @@ class ViewController: UIViewController, UITextFieldDelegate {
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
+    }
+    
+    //MARK: UITableView methods
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return myDataLithuanian.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let tableViewCell : UITableViewCell = UITableViewCell(style: .default, reuseIdentifier: "MyCell")
+        tableViewCell.textLabel?.text = "\(myDataLithuanian[indexPath.row]) : \(myDataEnglish[indexPath.row])"
+            //myData[indexPath.row]
+        return tableViewCell
     }
 }
 
